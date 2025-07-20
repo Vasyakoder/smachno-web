@@ -70,6 +70,13 @@ export default async function DishDetailsPage({ params }) {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
+            <Breadcrumbs
+  items={[
+    { label: 'Головна', href: '/' },
+    { label: 'Каталог страв', href: '/dishes' },
+    { label: dish.name }
+  ]}
+/>
       <div className="flex justify-between items-center mb-4">
         <Link href="/" className="text-blue-500 hover:underline">
           ← Назад на головну
@@ -131,13 +138,6 @@ export default async function DishDetailsPage({ params }) {
 
       {similarDishes?.length > 0 && (
         <div className="mt-8">
-        <Breadcrumbs
-  items={[
-    { label: 'Головна', href: '/' },
-    { label: 'Каталог страв', href: '/dishes' },
-    { label: dish.name }
-  ]}
-/>
           <h2 className="text-xl font-semibold mb-4">Схожі страви</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {similarDishes.map((similar) => (

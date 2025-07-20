@@ -11,7 +11,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="uk">
-      <body>
+      <body className="bg-white text-gray-900 dark:bg-black dark:text-gray-100">
         <FavoritesProvider>
           <CompareProvider>
             {children}
@@ -21,4 +21,3 @@ export default function RootLayout({ children }) {
     </html>
   );
 }
-

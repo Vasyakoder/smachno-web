@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import DishCard from './DishCard';
-import Link from 'next/link';
 import categoryColors from './categoryColors';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 export default function DishCatalogClient() {
   const [dishes, setDishes] = useState([]);
@@ -118,6 +118,12 @@ export default function DishCatalogClient() {
 
   return (
     <div className="flex gap-8 max-w-7xl mx-auto px-4">
+      <Breadcrumbs
+  items={[
+    { label: 'Головна', href: '/' },
+    { label: 'Каталог страв' }
+  ]}
+/>
       {/* Фильтры слева */}
       <aside className="w-64 space-y-6">
         <div>

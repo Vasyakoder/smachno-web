@@ -1,4 +1,5 @@
 // app/page.js
+
 export const metadata = {
   title: 'SmachnoGo — доставка їжі у Львові',
   description: 'Агрегатор доставки їжі у Львові: страви, ресторани, порівняння та обране. Знаходь найкраще швидко та зручно.',
@@ -21,7 +22,7 @@ import Link from 'next/link';
 
 export default function HomePage() {
   return (
-    <main className="max-w-4xl mx-auto px-4 py-10 text-center font-sans">
+    <main className="max-w-4xl mx-auto px-4 py-10 text-center font-sans"> 
       <h1 className="text-4xl font-bold mb-4">SmachnoGo</h1>
       <p className="text-lg text-gray-600 mb-10">Агрегатор доставки їжі у Львові</p>
 

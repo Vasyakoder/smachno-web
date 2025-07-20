@@ -3,6 +3,7 @@ import { createSupabaseServerClient } from '@/lib/supabaseServerClient';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 export async function generateMetadata({ params }) {
   const supabase = await createSupabaseServerClient();
@@ -62,6 +63,13 @@ export default async function RestaurantPage({ params }) {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 font-sans">
+      <Breadcrumbs
+  items={[
+    { label: 'Головна', href: '/' },
+    { label: 'Ресторани', href: '/restaurants' },
+    { label: restaurant.name }
+  ]}
+/>
       <div className="mb-6 flex justify-between items-center">
         <Link href="/" className="text-blue-500 hover:underline">← На головну</Link>
         <Link href="/dishes" className="text-blue-500 hover:underline">Каталог страв</Link>
