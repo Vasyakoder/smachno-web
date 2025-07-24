@@ -1,36 +1,35 @@
-'use client'
-
-import Link from 'next/link'
 import Image from 'next/image'
+import Tag from './Tag'
 
 export default function BaseDishCard({ dish }) {
-  const { id, name, image_url, category, cuisine } = dish
+  const minPrice = Math.min(...dish.dishes.map(d => d.price)).toFixed(2)
 
   return (
-    <Link href={`/catalog/${id}`} className="block">
-      <div className="border rounded-lg overflow-hidden hover:shadow-md transition-shadow bg-white flex flex-col h-full">
-        {image_url ? (
-          <div className="relative w-full h-48">
-            <Image
-              src={image_url}
-              alt={name}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 25vw"
-              priority={false}
-            />
+    <div className="bg-white rounded-lg shadow-md border hover:shadow-lg transition overflow-hidden flex flex-col">
+      <div className="relative w-full aspect-[4/3]">
+        <Image
+          src={dish.image || '/placeholder.png'}
+          alt={dish.name}
+          fill
+          className="object-cover"
+        />
+      </div>
+      <div className="p-3 flex-1 flex flex-col justify-between">
+        <div>
+          <h3 className="text-lg font-semibold mb-2">{dish.name}</h3>
+          <div className="flex flex-wrap gap-2 text-sm mb-3">
+            {dish.category && <Tag type="category" value={dish.category} />}
+            {dish.cuisine && <Tag type="cuisine" value={dish.cuisine} />}
           </div>
-        ) : (
-          <div className="w-full h-48 bg-gray-100 flex items-center justify-center text-gray-400 text-sm">
-            Без зображення
-          </div>
-        )}
-        <div className="p-4 flex flex-col flex-grow">
-          <h2 className="text-lg font-semibold mb-1">{name}</h2>
-          <p className="text-sm text-gray-600">{category}</p>
-          <p className="text-sm text-gray-500">{cuisine}</p>
+        </div>
+
+        <div className="flex items-end justify-between mt-auto">
+          <p className="text-green-600 font-bold text-base">
+            від {minPrice} грн
+          </p>
+          {/* Здесь позже будут кнопки ♡ и ♻ */}
         </div>
       </div>
-    </Link>
+    </div>
   )
 }
