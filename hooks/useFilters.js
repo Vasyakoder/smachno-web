@@ -1,66 +1,55 @@
 'use client'
 
-import { useSearchParams, useRouter } from 'next/navigation'
-import { useCallback, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 
 export function useFilters() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
+  const [filters, setFilters] = useState({
+    categories: [],
+    cuisines: [],
+  })
 
-  const categories = useMemo(() => {
-    const param = searchParams.get('category')
-    return param ? param.split(',') : []
-  }, [searchParams])
+  const [showDiscountOnly, setShowDiscountOnly] = useState(false)
 
-  const cuisines = useMemo(() => {
-    const param = searchParams.get('cuisine')
-    return param ? param.split(',') : []
-  }, [searchParams])
+  const [uniqueCategories, setUniqueCategories] = useState([])
+  const [uniqueCuisines, setUniqueCuisines] = useState([])
 
-  const showDiscountOnly = searchParams.get('discount') === 'true'
+  // Загружаем уникальные категории и кухни один раз при инициализации
+  useEffect(() => {
+    async function fetchData() {
+      const res = await fetch('/api/base-dishes')
+      const data = await res.json()
 
-  const toggleValue = useCallback((param, value) => {
-    const current = new Set(searchParams.getAll(param).flatMap(p => p.split(',')))
-    if (current.has(value)) {
-      current.delete(value)
-    } else {
-      current.add(value)
-    }
-    return [...current]
-  }, [searchParams])
+      const categories = [...new Set(data.map((dish) => dish.category).filter(Boolean))]
+      const cuisines = [...new Set(data.map((dish) => dish.cuisine).filter(Boolean))]
 
-  const updateFilters = useCallback((type, value) => {
-    const current = new URLSearchParams(searchParams.toString())
-    const updatedValues = toggleValue(type, value)
-
-    if (updatedValues.length > 0) {
-      current.set(type, updatedValues.join(','))
-    } else {
-      current.delete(type)
+      setUniqueCategories(categories)
+      setUniqueCuisines(cuisines)
     }
 
-    router.push(`?${current.toString()}`)
-  }, [router, searchParams, toggleValue])
+    fetchData()
+  }, [])
 
-  const toggleDiscount = useCallback(() => {
-    const current = new URLSearchParams(searchParams.toString())
-    if (showDiscountOnly) {
-      current.delete('discount')
-    } else {
-      current.set('discount', 'true')
-    }
-    router.push(`?${current.toString()}`)
-  }, [router, searchParams, showDiscountOnly])
+  function setFilter(type, value) {
+    setFilters((prev) => {
+      const updated = prev[type].includes(value)
+        ? prev[type].filter((v) => v !== value)
+        : [...prev[type], value]
+      return { ...prev, [type]: updated }
+    })
+  }
 
-  const resetFilters = useCallback(() => {
-    router.push(``)
-  }, [router])
+  function resetFilters() {
+    setFilters({ categories: [], cuisines: [] })
+    setShowDiscountOnly(false)
+  }
 
   return {
-    filters: { categories, cuisines },
-    showDiscountOnly,
-    updateFilters,
-    toggleDiscount,
+    filters,
+    setFilter,
     resetFilters,
+    uniqueCategories,
+    uniqueCuisines,
+    showDiscountOnly,
+    setShowDiscountOnly,
   }
 }
