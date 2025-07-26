@@ -2,13 +2,18 @@ import Image from 'next/image'
 import Tag from './Tag'
 
 export default function BaseDishCard({ dish }) {
-  const minPrice = Math.min(...dish.dishes.map(d => d.price)).toFixed(2)
+  const minPrice = dish.dishes?.length
+    ? Math.min(...dish.dishes.map(d => d.price)).toFixed(2)
+    : null
+
+  const imageSrc =
+    dish.image_url || dish.image || dish.dishes?.[0]?.image_url || '/placeholder.png'
 
   return (
     <div className="bg-white rounded-lg shadow-md border hover:shadow-lg transition overflow-hidden flex flex-col">
       <div className="relative w-full aspect-[4/3]">
         <Image
-          src={dish.image || '/placeholder.png'}
+          src={imageSrc}
           alt={dish.name}
           fill
           className="object-cover"
@@ -27,7 +32,6 @@ export default function BaseDishCard({ dish }) {
           <p className="text-green-600 font-bold text-base">
             від {minPrice} грн
           </p>
-          {/* Здесь позже будут кнопки ♡ и ♻ */}
         </div>
       </div>
     </div>

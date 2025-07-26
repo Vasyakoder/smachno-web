@@ -1,36 +1,71 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useFilters } from './useFilters'
+import { createBrowserClient } from '@supabase/ssr'
+import { useSearchParams } from 'next/navigation'
 
-export function useBaseDishes() {
+export default function useBaseDishes() {
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  )
+
+  const searchParams = useSearchParams()
+
   const [baseDishes, setBaseDishes] = useState([])
-  const { filters, showDiscountOnly } = useFilters()
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  const filtersString = searchParams.get('filters')
+  let filters = {}
+
+  try {
+    filters = filtersString ? JSON.parse(filtersString) : {}
+  } catch (err) {
+    console.error('❌ Ошибка парсинга filters JSON:', err)
+    filters = {}
+  }
 
   useEffect(() => {
-    const fetchDishes = async () => {
-      const res = await fetch('/api/base-dishes')
-      const data = await res.json()
-      setBaseDishes(data)
+    const fetchBaseDishes = async () => {
+      setLoading(true)
+      setError(null)
+
+      try {
+        let query = supabase.from('base_dishes').select('*, dishes(*)')
+
+        if (filters.category?.length) {
+          query = query.in('category', filters.category)
+        }
+
+        if (filters.cuisine?.length) {
+          query = query.in('cuisine', filters.cuisine)
+        }
+
+        if (filters.discount === true) {
+          query = query.gte('min_discount', 1)
+        }
+
+        const { data, error } = await query
+
+        if (error) {
+          console.error('❌ Supabase error:', error)
+          setError(error)
+          setBaseDishes([])
+        } else {
+          setBaseDishes(data || [])
+        }
+      } catch (err) {
+        console.error('❌ Unexpected error:', err)
+        setError(err)
+        setBaseDishes([])
+      }
+
+      setLoading(false)
     }
 
-    fetchDishes()
-  }, [])
+    fetchBaseDishes()
+  }, [filtersString])
 
-  const filteredDishes = baseDishes.filter((dish) => {
-    const matchesCategory =
-      filters.categories.length === 0 ||
-      filters.categories.includes(dish.category)
-
-    const matchesCuisine =
-      filters.cuisines.length === 0 ||
-      filters.cuisines.includes(dish.cuisine)
-
-    const matchesDiscount =
-      !showDiscountOnly || dish.dishes.some((d) => d.discount > 0)
-
-    return matchesCategory && matchesCuisine && matchesDiscount
-  })
-
-  return { baseDishes, filteredDishes }
+  return { baseDishes, loading, error }
 }

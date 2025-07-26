@@ -1,6 +1,6 @@
 'use client'
 
-import { useBaseDishes } from '@/hooks/useBaseDishes'
+import useBaseDishes from '@/hooks/useBaseDishes'
 import BaseDishCard from '@/components/BaseDishCard'
 import FiltersSidebar from '@/components/FiltersSidebar'
 

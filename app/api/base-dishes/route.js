@@ -1,13 +1,21 @@
 import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 
 export async function GET() {
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {
-      cookies: () => cookieStore,
+      cookies: {
+        get(name) {
+          return cookieStore.get(name)?.value
+        },
+        set() {},
+        remove() {},
+      },
+      headers,
     }
   )
 
@@ -16,12 +24,13 @@ export async function GET() {
     .select('*, dishes(*)')
 
   if (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-    })
+    return new Response(JSON.stringify({ error: error.message }), { status: 500 })
   }
 
   return new Response(JSON.stringify(data), {
     status: 200,
+    headers: {
+      'Content-Type': 'application/json',
+    },
   })
 }
